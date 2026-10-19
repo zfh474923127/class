@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 基础 · 学习框架 — 概念地图 / 词元 / CNN / RNN / 生成系统 / 模型评估</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #F2F2F4;
+    --surface: #FFFFFF;
+    --surface-muted: #F7F7F8;
+    --text: #171717;
+    --text-muted: #52525B;
+    --border: rgba(23, 23, 23, 0.12);
+    --brand: #0AB861;
+    --brand-strong: #02743B;
+    --brand-soft: #E5FFF2;
+    --brand-line: #0FDC78;
+    --radius-card: 12px;
+    --radius: 8px;
+    --font-sans: "PingFang SC", "Microsoft YaHei", "SF Pro Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, Consolas, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --bg: #0F0F10;
+      --surface: #1C1C1E;
+      --surface-muted: #262626;
+      --text: #E5E5E5;
+      --text-muted: #A1A1AA;
+      --border: rgba(229, 229, 229, 0.14);
+      --brand: #32F08C;
+      --brand-strong: #32F08C;
+      --brand-soft: #004D26;
+      --brand-line: #32F08C;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    padding: 32px 16px 48px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+  .sub {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin: 0 0 20px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .card h2 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 14px;
+  }
+  svg { display: block; width: 100%; height: auto; }
+  .grid-dot { fill: rgba(128,128,128,.22); }
+  .edge {
+    fill: none;
+    stroke: var(--text-muted);
+    stroke-opacity: .5;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .edge.main { stroke: var(--brand-line); stroke-opacity: .9; }
+  .node-box {
+    fill: var(--surface);
+    stroke: var(--border);
+    stroke-width: 1;
+  }
+  .node-focus .node-box {
+    fill: var(--brand-soft);
+    stroke: var(--brand);
+    stroke-width: 1.6;
+  }
+  .node-title {
+    fill: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .node-focus .node-title { fill: var(--brand-strong); }
+  .node-sub {
+    fill: var(--text-muted);
+    font-size: 12px;
+  }
+  .node-focus .node-sub { fill: var(--brand-strong); opacity: .75; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 720px) { .grid3 { grid-template-columns: 1fr; } }
+  .grid3 .card { margin-bottom: 0; }
+  .term-en {
+    display: block;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 500;
+    margin-top: 3px;
+  }
+  .def { font-size: 13px; line-height: 1.7; margin: 0 0 8px; }
+  .def strong { color: var(--brand-strong); font-weight: 600; }
+  .relation { color: var(--text-muted); font-size: 12px; margin: 14px 0 0; text-align: center; }
+  .flow-arrow { stroke-opacity: .75; marker-end: url(#cnn-arrow); }
+  .arrow-head { fill: var(--text-muted); }
+  .flow-arrow-alt { stroke-opacity: .75; marker-end: url(#tk-arrow); }
+  .chip { fill: var(--brand-soft); stroke: var(--brand); stroke-width: 1.25; }
+  .chip-label { fill: var(--brand-strong); font-size: 14px; font-weight: 500; }
+  .chip-id { fill: var(--text-muted); font-size: 12px; font-family: var(--font-mono); }
+  .mod-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 30px 0 8px;
+    scroll-margin-top: 24px;
+  }
+  .mod-no {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--brand-strong);
+    background: var(--brand-soft);
+    border: 1px solid var(--brand);
+    border-radius: 999px;
+    padding: 2px 10px;
+    white-space: nowrap;
+  }
+  .mod-name { font-size: 16px; font-weight: 600; }
+  .mod-goal { color: var(--text-muted); font-size: 12px; margin: 0 0 16px; }
+  .toc { display: grid; grid-template-columns: 1fr 1fr; column-gap: 24px; }
+  @media (max-width: 720px) { .toc { grid-template-columns: 1fr; } }
+  .toc a { color: var(--brand-strong); text-decoration: none; font-weight: 500; }
+  .toc a:hover { text-decoration: underline; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    text-align: center;
+  }
+  th { background: var(--surface-muted); font-weight: 600; }
+  td.tag { font-weight: 600; white-space: nowrap; }
+  .tp { color: #05994F; }
+  .tn { color: #05994F; }
+  .fp { color: #C2410C; }
+  .fn { color: #C2410C; }
+  @media (prefers-color-scheme: dark) {
+    .tp, .tn { color: #32F08C; }
+    .fp, .fn { color: #FB923C; }
+  }
+  ul { margin: 0; padding-left: 0; list-style: none; }
+  li {
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--border);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  li:last-child { border-bottom: none; }
+  .metric-name { font-weight: 600; }
+  code {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    background: var(--surface-muted);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1px 7px;
+  }
+  .note { color: var(--text-muted); font-size: 12px; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>AI 基础 · 学习框架</h1>
+  <p class="sub">五个模块循序渐进：基础概念 → 文本表示 → 网络结构 → 生成与运行 → 模型评估</p>
+
+  <div class="card">
+    <h2>学习地图 · 建议按顺序学习</h2>
+    <ul class="toc">
+      <li><a href="#m1">模块一　基础概念 —— AI / Agent / Harness</a></li>
+      <li><a href="#m2">模块二　文本表示 —— 词元 Token</a></li>
+      <li><a href="#m3">模块三　网络结构 —— CNN / RNN</a></li>
+      <li><a href="#m4">模块四　生成与运行 —— 六环节 / 训练与推断 / 采样参数</a></li>
+      <li><a href="#m5">模块五　模型评估 —— 混淆矩阵与四个指标</a></li>
+    </ul>
+  </div>
+
+  <div class="mod-head" id="m1">
+    <span class="mod-no">模块一</span>
+    <span class="mod-name">基础概念</span>
+  </div>
+  <p class="mod-goal">先建立术语坐标系：分清 AI、Agent、Harness 三者的层次关系。</p>
+
+  <div class="grid3">
+    <div class="card">
+      <h2>AI<span class="term-en">Artificial Intelligence · 人工智能</span></h2>
+      <p class="def">让机器模拟人类智能完成<strong>感知、推理、学习、决策</strong>等任务的技术总称。</p>
+      <p class="note">涵盖机器学习、深度学习、自然语言处理等分支；大语言模型（LLM）经海量文本训练获得理解与生成能力，是当前 AI 最核心的形态。</p>
+    </div>
+    <div class="card">
+      <h2>Agent<span class="term-en">智能体</span></h2>
+      <p class="def">以 LLM 为"大脑"，围绕目标自主完成<strong>感知 → 规划 → 行动 → 反思</strong>循环的 AI 系统。</p>
+      <p class="note">能调用工具（搜索、执行代码、读写文件），把大任务拆成多步并持续迭代直至完成——关键在于"自主做事"，而非一问一答。</p>
+    </div>
+    <div class="card">
+      <h2>Harness<span class="term-en">执行框架 · 智能体脚手架</span></h2>
+      <p class="def">包裹模型的工程外壳，负责<strong>循环控制、工具执行、上下文管理与权限安全</strong>，让模型的"想法"真正落地。</p>
+      <p class="note">模型负责思考，Harness 负责执行：运行工具调用、把结果回传、判断何时结束。类比：模型是引擎，Harness 是底盘与方向盘——如 Trae、Claude Code、Cursor 等编码智能体的执行框架。</p>
+    </div>
+  </div>
+  <p class="relation">关系链：AI 是领域 → LLM 是引擎 → Agent 是会自主干活的系统 → Harness 是让它跑起来的框架</p>
+
+  <div class="mod-head" id="m2">
+    <span class="mod-no">模块二</span>
+    <span class="mod-name">文本表示 · 词元 Token</span>
+  </div>
+  <p class="mod-goal">理解「文字」如何变成模型能计算的「数字」——这是所有大模型的入口。</p>
+
+  <div class="card">
+    <h2>词元 Token · 从文字到向量</h2>
+    <svg viewBox="0 0 720 256" role="img" aria-label="词元示意：一句话被切成若干词元，每个词元对应整数 ID，再转为向量进入模型">
+      <defs>
+        <marker id="tk-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto">
+          <path class="arrow-head" d="M1 1 L7 4 L1 7 Z"/>
+        </marker>
+      </defs>
+
+      <text class="node-sub" x="24" y="24">① 切分 · 一句话被切成若干词元（示意，实际取决于分词器）</text>
+
+      <rect class="chip" x="200" y="40" width="56" height="40" rx="8"/>
+      <text class="chip-label" x="228" y="66" text-anchor="middle">AI</text>
+      <text class="chip-id" x="228" y="100" text-anchor="middle">3821</text>
+
+      <rect class="chip" x="272" y="40" width="72" height="40" rx="8"/>
+      <text class="chip-label" x="308" y="66" text-anchor="middle">模型</text>
+      <text class="chip-id" x="308" y="100" text-anchor="middle">1573</text>
+
+      <rect class="chip" x="360" y="40" width="72" height="40" rx="8"/>
+      <text class="chip-label" x="396" y="66" text-anchor="middle">处理</text>
+      <text class="chip-id" x="396" y="100" text-anchor="middle">9046</text>
+
+      <rect class="chip" x="448" y="40" width="72" height="40" rx="8"/>
+      <text class="chip-label" x="484" y="66" text-anchor="middle">文本</text>
+      <text class="chip-id" x="484" y="100" text-anchor="middle">2210</text>
+
+      <text class="node-sub" x="24" y="146">② 流转 · 词元是模型实际处理的最小单位</text>
+
+      <path class="edge flow-arrow-alt" d="M186 196 H222"/>
+      <path class="edge flow-arrow-alt" d="M342 196 H378"/>
+      <path class="edge flow-arrow-alt" d="M498 196 H534"/>
+
+      <g class="node" transform="translate(66,170)">
+        <rect class="node-box" width="120" height="52" rx="8"/>
+        <text class="node-title" x="60" y="22" text-anchor="middle">原始文本</text>
+        <text class="node-sub" x="60" y="40" text-anchor="middle">字符序列</text>
+      </g>
+      <g class="node" transform="translate(222,170)">
+        <rect class="node-box" width="120" height="52" rx="8"/>
+        <text class="node-title" x="60" y="22" text-anchor="middle">分词</text>
+        <text class="node-sub" x="60" y="40" text-anchor="middle">Tokenize</text>
+      </g>
+      <g class="node-focus" transform="translate(378,170)">
+        <rect class="node-box" width="120" height="52" rx="8"/>
+        <text class="node-title" x="60" y="22" text-anchor="middle">词元 Token</text>
+        <text class="node-sub" x="60" y="40" text-anchor="middle">整数 ID</text>
+      </g>
+      <g class="node" transform="translate(534,170)">
+        <rect class="node-box" width="120" height="52" rx="8"/>
+        <text class="node-title" x="60" y="22" text-anchor="middle">向量</text>
+        <text class="node-sub" x="60" y="40" text-anchor="middle">Embedding</text>
+      </g>
+    </svg>
+    <p class="note">读法：模型不直接读「字」或「词」，而是先切成词元，再把每个词元换成整数 ID，查嵌入表得到向量后才开始计算。</p>
+  </div>
+
+  <div class="grid3">
+    <div class="card">
+      <h2>词元是什么</h2>
+      <ul>
+        <li><span class="metric-name">定义</span><br>模型处理文本的最小单位，是「文字」与「数字」之间的桥梁</li>
+        <li><span class="metric-name">谁切分</span><br>由分词器 Tokenizer 完成，常见算法：BPE / WordPiece / SentencePiece</li>
+        <li><span class="metric-name">切分规律</span><br>高频词整体成一个词元，生僻词被拆成子词；标点、空格、数字常切得很碎</li>
+      </ul>
+      <p class="note">同一个词在不同分词器下可能切成不同词元，没有统一答案。</p>
+    </div>
+    <div class="card">
+      <h2>为什么重要</h2>
+      <ul>
+        <li><span class="metric-name">上下文窗口</span><br>常说的 128K，单位是词元数，不是字数</li>
+        <li><span class="metric-name">API 计费</span><br>按输入 + 输出的词元总数收费</li>
+        <li><span class="metric-name">生成速度</span><br>用 tokens/s 衡量，越快越流畅</li>
+      </ul>
+      <p class="note">粗略换算（估算）：英文约 0.75 个单词 ≈ 1 词元；中文约 1 个字 ≈ 1 词元。</p>
+    </div>
+    <div class="card">
+      <h2>常见误区</h2>
+      <ul>
+        <li><span class="metric-name">不等于字或词</span><br>子词、标点、空格都可能是独立词元</li>
+        <li><span class="metric-name">字符数 ≠ 成本</span><br>计费按词元，不按字符</li>
+        <li><span class="metric-name">特殊字符更费</span><br>emoji、生僻字可能占多个词元</li>
+      </ul>
+      <p class="note">记住一句话：模型眼中的世界，是按词元计量的。</p>
+    </div>
+  </div>
+
+  <div class="mod-head" id="m3">
+    <span class="mod-no">模块三</span>
+    <span class="mod-name">网络结构</span>
+  </div>
+  <p class="mod-goal">分清两类经典结构：CNN 擅长空间（图像），RNN 擅长时序（序列）。</p>
+
+  <div class="card">
+    <h2>卷积神经网络 CNN · 数据流水线</h2>
+    <svg viewBox="0 0 720 136" role="img" aria-label="CNN 数据流水线：输入图像 → 卷积层 → ReLU 激活 → 池化层，重复堆叠后经全连接层输出类别概率">
+      <defs>
+        <marker id="cnn-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+          <path class="arrow-head" d="M0 0 L8 4 L0 8 Z"/>
+        </marker>
+      </defs>
+      <!-- 重复堆叠提示 -->
+      <path class="edge flow-arrow" stroke-dasharray="4 4" d="M420 64 V30 H180 V60"/>
+      <text class="node-sub" x="300" y="22" text-anchor="middle">× N 重复堆叠</text>
+      <!-- 主流程箭头 -->
+      <path class="edge flow-arrow" d="M104 90 H129"/>
+      <path class="edge flow-arrow" d="M226 90 H251"/>
+      <path class="edge flow-arrow" d="M344 90 H369"/>
+      <path class="edge flow-arrow" d="M466 90 H491"/>
+      <path class="edge flow-arrow" d="M588 90 H613"/>
+
+      <g class="node" transform="translate(16,64)">
+        <rect class="node-box" width="88" height="52" rx="8"/>
+        <text class="node-title" x="44" y="23" text-anchor="middle">输入图像</text>
+        <text class="node-sub" x="44" y="41" text-anchor="middle">RGB 像素矩阵</text>
+      </g>
+      <g class="node" transform="translate(134,64)">
+        <rect class="node-box" width="92" height="52" rx="8"/>
+        <text class="node-title" x="46" y="23" text-anchor="middle">卷积层</text>
+        <text class="node-sub" x="46" y="41" text-anchor="middle">提取局部特征</text>
+      </g>
+      <g class="node" transform="translate(256,64)">
+        <rect class="node-box" width="88" height="52" rx="8"/>
+        <text class="node-title" x="44" y="23" text-anchor="middle">ReLU 激活</text>
+        <text class="node-sub" x="44" y="41" text-anchor="middle">引入非线性</text>
+      </g>
+      <g class="node" transform="translate(374,64)">
+        <rect class="node-box" width="92" height="52" rx="8"/>
+        <text class="node-title" x="46" y="23" text-anchor="middle">池化层</text>
+        <text class="node-sub" x="46" y="41" text-anchor="middle">降采样压缩</text>
+      </g>
+      <g class="node" transform="translate(496,64)">
+        <rect class="node-box" width="92" height="52" rx="8"/>
+        <text class="node-title" x="46" y="23" text-anchor="middle">全连接层</text>
+        <text class="node-sub" x="46" y="41" text-anchor="middle">汇总全部特征</text>
+      </g>
+      <g class="node-focus" transform="translate(618,64)">
+        <rect class="node-box" width="86" height="52" rx="8"/>
+        <text class="node-title" x="43" y="23" text-anchor="middle">输出</text>
+        <text class="node-sub" x="43" y="41" text-anchor="middle">类别概率</text>
+      </g>
+    </svg>
+    <p class="note">读法：图像经「卷积 → ReLU → 池化」逐层堆叠，特征由简单到复杂（边缘 → 纹理 → 部件 → 整体），最终由全连接层输出分类结果。</p>
+  </div>
+
+  <div class="grid3">
+    <div class="card">
+      <h2>CNN 核心组件</h2>
+      <ul>
+        <li><span class="metric-name">卷积层 Conv</span><br>卷积核（如 3×3）在输入上滑动做乘加运算，提取边缘、纹理等局部特征</li>
+        <li><span class="metric-name">激活函数 ReLU</span><br>f(x) = max(0, x)，引入非线性，让网络能拟合复杂模式</li>
+        <li><span class="metric-name">池化层 Pooling</span><br>最大池化取窗口内最大值，压缩尺寸、保留显著特征、抗轻微偏移</li>
+        <li><span class="metric-name">全连接层 FC</span><br>把特征图展平后汇总，输出各类别得分</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>CNN 三大特性</h2>
+      <ul>
+        <li><span class="metric-name">局部感受野</span><br>每个神经元只看一小块区域，符合图像"局部相关"的先验</li>
+        <li><span class="metric-name">权值共享</span><br>同一个卷积核扫遍全图，参数量远小于全连接网络</li>
+        <li><span class="metric-name">平移不变性</span><br>目标移动位置后，同一组卷积核仍能捕捉到相同特征</li>
+      </ul>
+      <p class="note">与全连接网络相比：参数更少、训练更快、更适配图像结构。</p>
+    </div>
+    <div class="card">
+      <h2>尺寸公式与经典网络</h2>
+      <ul>
+        <li><span class="metric-name">输出尺寸</span><br><code>O = (N − K + 2P) / S + 1</code></li>
+        <li><span class="metric-name">符号说明</span><br>N 输入边长 · K 卷积核 · P 零填充 · S 步幅</li>
+        <li><span class="metric-name">经典演进</span><br>LeNet → AlexNet → VGG → ResNet（残差连接）</li>
+        <li><span class="metric-name">典型应用</span><br>图像分类、目标检测、人脸识别、医学影像</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>循环神经网络 RNN · 按时间步展开</h2>
+    <svg viewBox="0 0 720 190" role="img" aria-label="RNN 按时间展开图：x1至x4依次输入RNN单元，隐藏状态在单元间横向传递，每步输出y1至y4">
+      <!-- 输出箭头 -->
+      <path class="edge flow-arrow" d="M138 76 V48"/>
+      <path class="edge flow-arrow" d="M286 76 V48"/>
+      <path class="edge flow-arrow" d="M434 76 V48"/>
+      <path class="edge flow-arrow" d="M582 76 V48"/>
+      <!-- 输出 y -->
+      <g class="node" transform="translate(88,8)">
+        <rect class="node-box" width="100" height="36" rx="8"/>
+        <text class="node-title" x="50" y="23" text-anchor="middle">y₁ 输出</text>
+      </g>
+      <g class="node" transform="translate(236,8)">
+        <rect class="node-box" width="100" height="36" rx="8"/>
+        <text class="node-title" x="50" y="23" text-anchor="middle">y₂ 输出</text>
+      </g>
+      <g class="node" transform="translate(384,8)">
+        <rect class="node-box" width="100" height="36" rx="8"/>
+        <text class="node-title" x="50" y="23" text-anchor="middle">y₃ 输出</text>
+      </g>
+      <g class="node" transform="translate(532,8)">
+        <rect class="node-box" width="100" height="36" rx="8"/>
+        <text class="node-title" x="50" y="23" text-anchor="middle">y₄ 输出</text>
+      </g>
+      <!-- 隐藏状态传递 -->
+      <path class="edge flow-arrow" d="M188 100 H231"/>
+      <path class="edge flow-arrow" d="M336 100 H379"/>
+      <path class="edge flow-arrow" d="M484 100 H527"/>
+      <text class="node-sub" x="209" y="92" text-anchor="middle">h₁</text>
+      <text class="node-sub" x="357" y="92" text-anchor="middle">h₂</text>
+      <text class="node-sub" x="505" y="92" text-anchor="middle">h₃</text>
+      <!-- RNN 单元 -->
+      <g class="node-focus" transform="translate(88,76)">
+        <rect class="node-box" width="100" height="48" rx="8"/>
+        <text class="node-title" x="50" y="29" text-anchor="middle">RNN 单元</text>
+      </g>
+      <g class="node-focus" transform="translate(236,76)">
+        <rect class="node-box" width="100" height="48" rx="8"/>
+        <text class="node-title" x="50" y="29" text-anchor="middle">RNN 单元</text>
+      </g>
+      <g class="node-focus" transform="translate(384,76)">
+        <rect class="node-box" width="100" height="48" rx="8"/>
+        <text class="node-title" x="50" y="29" text-anchor="middle">RNN 单元</text>
+      </g>
+      <g class="node-focus" transform="translate(532,76)">
+        <rect class="node-box" width="100" height="48" rx="8"/>
+        <text class="node-title" x="50" y="29" text-anchor="middle">RNN 单元</text>
+      </g>
+      <!-- 输入箭头 -->
+      <path class="edge flow-arrow" d="M138 148 V128"/>
+      <path class="edge flow-arrow" d="M286 148 V128"/>
+      <path class="edge flow-arrow" d="M434 148 V128"/>
+      <path class="edge flow-arrow" d="M582 148 V128"/>
+      <!-- 输入 x -->
+      <g class="node" transform="translate(88,148)">
+        <rect class="node-box" width="100" height="36" rx="8"/>
+        <text class="node-title" x="50" y="23" text-anchor="middle">x₁ 输入</text>
+      </g>
+      <g class="node" transform="translate(236,148)">
+        <rect class="node-box" width="100" height="36" rx="8"/>
+        <text class="node-title" x="50" y="23" text-anchor="middle">x₂ 输入</text>
+      </g>
+      <g class="node" transform="translate(384,148)">
+        <rect class="node-box" width="100" height="36" rx="8"/>
+        <text class="node-title" x="50" y="23" text-anchor="middle">x₃ 输入</text>
+      </g>
+      <g class="node" transform="translate(532,148)">
+        <rect class="node-box" width="100" height="36" rx="8"/>
+        <text class="node-title" x="50" y="23" text-anchor="middle">x₄ 输入</text>
+      </g>
+    </svg>
+    <p class="note">读法：同一组参数在所有时间步共享；隐藏状态 h 沿横向箭头传递，把「上文信息」带给下一步——这就是 RNN 的记忆。y₁–y₄ 可逐步输出，也可只在末步输出。</p>
+  </div>
+
+  <div class="grid3">
+    <div class="card">
+      <h2>RNN 核心机制</h2>
+      <ul>
+        <li><span class="metric-name">隐藏状态 Hidden State</span><br><code>h_t = f(W_x·x_t + W_h·h_{t-1} + b)</code>，充当"记忆"，携带历史信息前进</li>
+        <li><span class="metric-name">按时间展开</span><br>同一个单元在 t = 1…T 逐步复用，等价于一条沿时间的深链</li>
+        <li><span class="metric-name">参数共享</span><br>W_x、W_h 在所有时间步复用，参数量与序列长度无关</li>
+        <li><span class="metric-name">输出方式</span><br>可每步输出 y_t（逐词生成），也可只在末步输出（序列分类）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>局限与改进</h2>
+      <ul>
+        <li><span class="metric-name">梯度消失 / 爆炸</span><br>长序列反向传播时梯度连乘衰减或放大，难以学习长距离依赖</li>
+        <li><span class="metric-name">LSTM 长短期记忆</span><br>遗忘门 / 输入门 / 输出门，选择性地记住与遗忘</li>
+        <li><span class="metric-name">GRU</span><br>简化为更新门 + 重置门，参数更少、效果接近</li>
+        <li><span class="metric-name">走向 Transformer</span><br>自注意力可并行建模长依赖，已成 NLP 主流架构</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>CNN vs RNN · 应用</h2>
+      <ul>
+        <li><span class="metric-name">擅长数据</span><br>CNN 吃"空间邻域"（图像），RNN 记"时间前后"（序列）</li>
+        <li><span class="metric-name">典型应用</span><br>文本生成、机器翻译、语音识别、时间序列预测</li>
+        <li><span class="metric-name">记忆口诀</span><br>CNN 看"局部形状"，RNN 记"上下文顺序"</li>
+      </ul>
+      <p class="note">提示：如今 NLP 任务多被 Transformer 取代，RNN 更常出现在轻量序列与时序预测场景。</p>
+    </div>
+  </div>
+
+  <div class="mod-head" id="m4">
+    <span class="mod-no">模块四</span>
+    <span class="mod-name">生成与运行</span>
+  </div>
+  <p class="mod-goal">看懂一次生成要经过哪些环节，以及「训练」与「推断」的分工和可控的采样参数。</p>
+
+  <div class="card">
+    <h2>生成系统 · 六个环节</h2>
+    <svg viewBox="0 0 720 136" role="img" aria-label="生成系统六环节流水线：提示输入 → 语义编码 → 生成建模 → 采样控制 → 解码后处理 → 输出交付">
+      <path class="edge flow-arrow" d="M110 90 H128"/>
+      <path class="edge flow-arrow" d="M228 90 H246"/>
+      <path class="edge flow-arrow" d="M346 90 H364"/>
+      <path class="edge flow-arrow" d="M464 90 H482"/>
+      <path class="edge flow-arrow" d="M582 90 H600"/>
+
+      <g class="node" transform="translate(10,64)">
+        <rect class="node-box" width="100" height="52" rx="8"/>
+        <text class="node-title" x="50" y="23" text-anchor="middle">提示输入</text>
+        <text class="node-sub" x="50" y="41" text-anchor="middle">用户需求描述</text>
+      </g>
+      <g class="node" transform="translate(128,64)">
+        <rect class="node-box" width="100" height="52" rx="8"/>
+        <text class="node-title" x="50" y="23" text-anchor="middle">语义编码</text>
+        <text class="node-sub" x="50" y="41" text-anchor="middle">文本→潜向量</text>
+      </g>
+      <g class="node" transform="translate(246,64)">
+        <rect class="node-box" width="100" height="52" rx="8"/>
+        <text class="node-title" x="50" y="23" text-anchor="middle">生成建模</text>
+        <text class="node-sub" x="50" y="41" text-anchor="middle">扩散 / 自回归</text>
+      </g>
+      <g class="node" transform="translate(364,64)">
+        <rect class="node-box" width="100" height="52" rx="8"/>
+        <text class="node-title" x="50" y="23" text-anchor="middle">采样控制</text>
+        <text class="node-sub" x="50" y="41" text-anchor="middle">调节随机性</text>
+      </g>
+      <g class="node" transform="translate(482,64)">
+        <rect class="node-box" width="100" height="52" rx="8"/>
+        <text class="node-title" x="50" y="23" text-anchor="middle">解码后处理</text>
+        <text class="node-sub" x="50" y="41" text-anchor="middle">潜空间→像素</text>
+      </g>
+      <g class="node-focus" transform="translate(600,64)">
+        <rect class="node-box" width="100" height="52" rx="8"/>
+        <text class="node-title" x="50" y="23" text-anchor="middle">输出交付</text>
+        <text class="node-sub" x="50" y="41" text-anchor="middle">结果与反馈</text>
+      </g>
+    </svg>
+    <p class="note">读法：把「需求」变成「产物」的六步链路——前三步理解意图并生成内容，第四步决定随机程度，后两步把内部表示解码为可交付成品并收集反馈。文本、图像、语音系统的环节名称略有差异，骨架一致。</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>训练 Training · 循环</h2>
+      <ul>
+        <li><span class="metric-name">① 前向传播 Forward</span><br>输入过网络，算出预测结果</li>
+        <li><span class="metric-name">② 计算损失 Loss</span><br>预测与真实标签比较，量出误差</li>
+        <li><span class="metric-name">③ 反向传播 Backward</span><br>按链式法则求各参数的梯度</li>
+        <li><span class="metric-name">④ 更新参数 Update</span><br>优化器（SGD / Adam）按梯度调整权重</li>
+      </ul>
+      <p class="note">反复迭代直到损失收敛；需要大规模数据与算力，通常离线批量进行。</p>
+    </div>
+    <div class="card">
+      <h2>推断 Inference · 流程</h2>
+      <ul>
+        <li><span class="metric-name">输入 → 前向传播 → 输出</span><br>只用训练好的参数做一次前向计算，不更新权重</li>
+        <li><span class="metric-name">目标</span><br>低延迟、低成本、输出稳定</li>
+        <li><span class="metric-name">常见优化</span><br>量化、蒸馏、剪枝、KV 缓存、批处理</li>
+      </ul>
+      <p class="note">训练一次、推断千万次——线上体验主要取决于推断的效率。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>训练 vs 推断 · 对比</h2>
+    <table>
+      <tr>
+        <th>维度</th>
+        <th>训练 Training</th>
+        <th>推断 Inference</th>
+      </tr>
+      <tr>
+        <th>核心目标</th>
+        <td>从数据中学出参数</td>
+        <td>用已有参数算出结果</td>
+      </tr>
+      <tr>
+        <th>参数更新</th>
+        <td>反向传播 + 优化器持续更新</td>
+        <td>冻结不变</td>
+      </tr>
+      <tr>
+        <th>数据需求</th>
+        <td>大批量、多轮迭代</td>
+        <td>单条或小批量输入</td>
+      </tr>
+      <tr>
+        <th>计算特点</th>
+        <td>高算力、耗时长、可离线</td>
+        <td>低延迟、在线、成本敏感</td>
+      </tr>
+      <tr>
+        <th>关键优化</th>
+        <td>分布式并行、混合精度</td>
+        <td>量化、蒸馏、KV 缓存</td>
+      </tr>
+      <tr>
+        <th>延迟要求</th>
+        <td>不敏感，重吞吐</td>
+        <td>敏感，重响应速度</td>
+      </tr>
+    </table>
+    <p class="note">一句话：训练是「学」，推断是「用」；训练贵在算力与数据，推断贵在延迟与成本。</p>
+  </div>
+
+  <div class="grid3">
+    <div class="card">
+      <h2>采样策略</h2>
+      <ul>
+        <li><span class="metric-name">贪心 Greedy</span><br>每步取概率最大的候选，最稳但易重复、缺创意</li>
+        <li><span class="metric-name">束搜索 Beam Search</span><br>并行保留多条候选路径择优，质量高但慢、偏保守</li>
+        <li><span class="metric-name">随机采样</span><br>按概率分布抽样，输出多样但可能跑题</li>
+      </ul>
+      <p class="note">确定性策略求稳，随机策略求变；随机程度由下面几个参数控制。</p>
+    </div>
+    <div class="card">
+      <h2>三个核心参数</h2>
+      <ul>
+        <li><span class="metric-name">Temperature 温度</span><br>缩放概率分布：T→0 趋于贪心（确定），T 越大分布越平、越随机</li>
+        <li><span class="metric-name">Top-k</span><br>只在概率最高的 k 个候选里抽样，砍掉长尾噪声</li>
+        <li><span class="metric-name">Top-p 核采样</span><br>从累计概率达到 p 的最小候选集里抽样，比 Top-k 更自适应</li>
+      </ul>
+      <p class="note">常用组合：温度 0.7 + Top-p 0.9；要可复现就把温度调低并固定随机种子。</p>
+    </div>
+    <div class="card">
+      <h2>其他控制参数</h2>
+      <ul>
+        <li><span class="metric-name">max_tokens</span><br>限制生成长度上限，控制耗时与成本</li>
+        <li><span class="metric-name">Repetition penalty</span><br>惩罚已出现的 token，抑制复读</li>
+        <li><span class="metric-name">Seed / Stop</span><br>固定种子使结果可复现；命中停止符提前结束</li>
+        <li><span class="metric-name">图像生成专用</span><br>Guidance scale（CFG）控制贴合提示词程度，Steps 平衡去噪质量与耗时</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="mod-head" id="m5">
+    <span class="mod-no">模块五</span>
+    <span class="mod-name">模型评估</span>
+  </div>
+  <p class="mod-goal">掌握混淆矩阵与四大指标，学会判断一个模型「好不好」。</p>
+
+  <div class="card">
+    <svg viewBox="0 0 720 540" role="img" aria-label="AI基础知识框架树状图：AI基础下的二分类混淆矩阵，包含四个基础指标和四个评价指标">
+      <defs>
+        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+          <circle class="grid-dot" cx="1" cy="1" r="1"/>
+        </pattern>
+      </defs>
+      <rect x="0" y="0" width="720" height="540" rx="10" fill="url(#grid)"/>
+
+      <!-- 连线：AI基础 → 混淆矩阵 -->
+      <path class="edge main" d="M128 270 H166"/>
+      <!-- 连线：混淆矩阵 → 两个指标组 -->
+      <path class="edge" d="M294 270 H312 Q320 270 320 262 V147 Q320 139 328 139 H330"/>
+      <path class="edge" d="M294 270 H312 Q320 270 320 278 V393 Q320 401 328 401 H330"/>
+      <!-- 连线：基础指标组 → 四个叶子 -->
+      <path class="edge" d="M440 139 H458 V52 H480"/>
+      <path class="edge" d="M440 139 H458 V110 H480"/>
+      <path class="edge" d="M440 139 H458 V168 H480"/>
+      <path class="edge" d="M440 139 H458 V226 H480"/>
+      <!-- 连线：评价指标组 → 四个叶子 -->
+      <path class="edge" d="M440 401 H458 V314 H480"/>
+      <path class="edge" d="M440 401 H458 V372 H480"/>
+      <path class="edge" d="M440 401 H458 V430 H480"/>
+      <path class="edge" d="M440 401 H458 V488 H480"/>
+
+      <!-- 第1列：AI基础（根/焦点） -->
+      <g class="node-focus" transform="translate(32,246)">
+        <rect class="node-box" width="96" height="48" rx="8"/>
+        <text class="node-title" x="48" y="29" text-anchor="middle">AI 基础</text>
+      </g>
+
+      <!-- 第2列：二分类混淆矩阵 -->
+      <g class="node-focus" transform="translate(166,246)">
+        <rect class="node-box" width="128" height="48" rx="8"/>
+        <text class="node-title" x="64" y="29" text-anchor="middle">二分类混淆矩阵</text>
+      </g>
+
+      <!-- 第3列：两个指标组 -->
+      <g class="node" transform="translate(330,113)">
+        <rect class="node-box" width="110" height="52" rx="8"/>
+        <text class="node-title" x="55" y="23" text-anchor="middle">四个基础指标</text>
+        <text class="node-sub" x="55" y="41" text-anchor="middle">矩阵四要素</text>
+      </g>
+      <g class="node" transform="translate(330,375)">
+        <rect class="node-box" width="110" height="52" rx="8"/>
+        <text class="node-title" x="55" y="23" text-anchor="middle">四个评价指标</text>
+        <text class="node-sub" x="55" y="41" text-anchor="middle">模型评价标准</text>
+      </g>
+
+      <!-- 第4列：基础指标叶子 -->
+      <g class="node" transform="translate(480,30)">
+        <rect class="node-box" width="200" height="44" rx="8"/>
+        <text class="node-title" x="12" y="19">TP 真正例</text>
+        <text class="node-sub" x="12" y="36">实际为正 · 预测为正</text>
+      </g>
+      <g class="node" transform="translate(480,88)">
+        <rect class="node-box" width="200" height="44" rx="8"/>
+        <text class="node-title" x="12" y="19">FP 假正例</text>
+        <text class="node-sub" x="12" y="36">实际为负 · 预测为正（误报）</text>
+      </g>
+      <g class="node" transform="translate(480,146)">
+        <rect class="node-box" width="200" height="44" rx="8"/>
+        <text class="node-title" x="12" y="19">TN 真负例</text>
+        <text class="node-sub" x="12" y="36">实际为负 · 预测为负</text>
+      </g>
+      <g class="node" transform="translate(480,204)">
+        <rect class="node-box" width="200" height="44" rx="8"/>
+        <text class="node-title" x="12" y="19">FN 假负例</text>
+        <text class="node-sub" x="12" y="36">实际为正 · 预测为负（漏报）</text>
+      </g>
+
+      <!-- 第4列：评价指标叶子 -->
+      <g class="node" transform="translate(480,292)">
+        <rect class="node-box" width="200" height="44" rx="8"/>
+        <text class="node-title" x="12" y="19">Accuracy 准确率</text>
+        <text class="node-sub" x="12" y="36">(TP+TN) / N　整体判对比例</text>
+      </g>
+      <g class="node" transform="translate(480,350)">
+        <rect class="node-box" width="200" height="44" rx="8"/>
+        <text class="node-title" x="12" y="19">Precision 精确率</text>
+        <text class="node-sub" x="12" y="36">TP / (TP+FP)　预测为正的纯度</text>
+      </g>
+      <g class="node" transform="translate(480,408)">
+        <rect class="node-box" width="200" height="44" rx="8"/>
+        <text class="node-title" x="12" y="19">Recall 召回率</text>
+        <text class="node-sub" x="12" y="36">TP / (TP+FN)　正例被找出比例</text>
+      </g>
+      <g class="node" transform="translate(480,466)">
+        <rect class="node-box" width="200" height="44" rx="8"/>
+        <text class="node-title" x="12" y="19">F1 值</text>
+        <text class="node-sub" x="12" y="36">2PR / (P+R)　P 与 R 的调和均值</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>混淆矩阵（2×2）</h2>
+      <table>
+        <tr>
+          <th></th>
+          <th>预测：正例</th>
+          <th>预测：负例</th>
+        </tr>
+        <tr>
+          <th>实际：正例</th>
+          <td class="tag tp">TP 真正例</td>
+          <td class="tag fn">FN 假负例</td>
+        </tr>
+        <tr>
+          <th>实际：负例</th>
+          <td class="tag fp">FP 假正例</td>
+          <td class="tag tn">TN 真负例</td>
+        </tr>
+      </table>
+      <p class="note">记忆口诀：先看真假（预测对不对），再看正负（预测成什么）。</p>
+    </div>
+
+    <div class="card">
+      <h2>完整公式（N = 样本总数）</h2>
+      <ul>
+        <li><span class="metric-name">准确率 Accuracy</span><br><code>Accuracy = (TP + TN) / (TP + FP + TN + FN)</code></li>
+        <li><span class="metric-name">精确率 Precision</span><br><code>Precision = TP / (TP + FP)</code></li>
+        <li><span class="metric-name">召回率 Recall（灵敏度）</span><br><code>Recall = TP / (TP + FN)</code></li>
+        <li><span class="metric-name">F1 值</span><br><code>F1 = 2·P·R / (P + R)</code></li>
+      </ul>
+      <p class="note">类别不平衡时 Accuracy 可能虚高，应重点看 Precision、Recall 与 F1。</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>
